@@ -20,11 +20,9 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to jhusseth application." });
 });
 
-app.get("*", (req, res) => {
-  res.json({ message: "Page Not Found" });
-});
-
+app.use(require('./routes/campus.routes'))
 app.use(require('./routes/auth.routes'))
+
 
 const attachUser = (req, res, next) => {
   const token = req.headers.authorization;
@@ -54,5 +52,10 @@ db.connect();
 app.set('port', process.env.PORT || 3001);
 app.listen(app.get('port'), () => {
   console.log('Server listening on port: ', app.get('port'));
+});
+
+
+app.get("*", (req, res) => {
+  res.json({ message: "Page Not Found" });
 });
 
