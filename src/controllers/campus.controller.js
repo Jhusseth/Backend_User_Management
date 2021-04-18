@@ -42,7 +42,45 @@ CampusController.campusCreate = async (req, res)=>{
 }
 
 CampusController.campusUpdate = async (req, res)=>{
-    
+    const ubication = {
+        city: req.body.city,
+        address: req.body.address,
+        zipcode: req.body.zipcode
+    }
+
+    const campus = {
+        name: req.body.name,
+        active: req.body.active,
+        ubication: ubication
+    }
+
+    console.log(campus)
+    try{
+        // await Campus.updateOne(({_id:req.params.id},campus),function(err){
+        //     if(err){
+        //         console.log(err);
+        //         res.send(err);
+        //     }
+        //     else{
+        //         res.status(200).json({
+        //             message: "The campus was update"
+        //         })
+        //     }
+        // })
+
+        await Campus.findOneAndUpdate({_id:req.params.id},campus).then( () => {
+            res.status(200).json({
+                message: " Was update !!"
+            })
+        })
+        
+            
+    }
+    catch(err){
+        res.status(400).json({
+            message: "Problem in update"
+        })
+    }
 }
 
 CampusController.campusDelete = async (req, res)=>{
