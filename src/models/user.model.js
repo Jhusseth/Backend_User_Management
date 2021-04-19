@@ -7,9 +7,9 @@ const userModel = new Schema({
   email: { type: String, required: true },
   password: { type: String, required: true },
   role: { type: String, required: true, default: 'user' },
-  valid_until: {Type: Date, required:false,},
-  campus:{ type: Schema.Types.ObjectId, ref: "campus" },
-  valid:{ type: Boolean, required: false, default: false}
+  valid_until: { type: Date, required: false },
+  campus:{type: Schema.ObjectId, ref: "campus"},
+  valid: { type: Boolean, required: false, default: false}
 
 });
 

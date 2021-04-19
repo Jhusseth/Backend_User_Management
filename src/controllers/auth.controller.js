@@ -127,8 +127,8 @@ AuthController.register = async (req, res) => {
 
 AuthController.requireAuth = jwt({
     secret: process.env.JWT_SECRET,
-    audience: 'api.orbit',
-    issuer: 'api.orbit'
+    audience: 'api.user.management',
+    issuer: 'api.user.management'
 });
 
 AuthController.requireAdmin = (req, res, next) => {

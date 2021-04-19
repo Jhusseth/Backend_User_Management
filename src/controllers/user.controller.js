@@ -1,28 +1,38 @@
-const userController = {};
+const UserController = {};
 const User = require('../models/user.model')
 const Campus = require('../models/campus.model')
 const {
-    createToken,
     hashPassword,
 } = require('../config/auth.config');
 
-userController.userList = async (req, res)=>{
-    User.find({}, function(err, users){
+
+UserController.userRegisters = async (req, res)=>{
+  User.find({}, function(err, users){
+      res.status(200).json({
+          users: users
+      });
+  });  
+}
+
+UserController.userList = async (req, res)=>{
+    User.find({campus:req.params.idCampus}, function(err, users){
         res.status(200).json({
             users: users
         });
     });  
 }
 
-userController.createUser = async (req, res)=>{
+UserController.createUser = async (req, res)=>{
     try {
-        const { email, firstName, lastName, valid_until, valid, campus_id } = req.body;
+        const { email, firstName, lastName, valid_until, valid } = req.body;
     
         const hashedPassword = await hashPassword(
           req.body.password
         );
 
-        const usrCampus=  await Campus.findById(campus_id)
+        const campus = await Campus.findById(req.params.idCampus);
+
+        const valid_date = valid_until.split('T')
     
         const userData = {
           email: email.toLowerCase(),
@@ -30,9 +40,9 @@ userController.createUser = async (req, res)=>{
           lastName,
           password: hashedPassword,
           role: 'admin',
-          valid_until,
-          campus:usrCampus,
-          valid,
+          valid_until: valid_date[0] + " " + valid_date[1],
+          campus,
+          valid
         };
     
         const existingEmail = await User.findOne({
@@ -47,48 +57,61 @@ userController.createUser = async (req, res)=>{
     
         const newUser = new User(userData);
         const savedUser = await newUser.save();
-        usrCampus.users.push(newUser)
-
-        Campus.updateOne({_id:campus_id},{usrCampus});
     
         if (savedUser) {
-          createToken(savedUser);
 
           return res.json({
             message: 'User created!',
           });
-        } else {
+        } 
+        else {
           return res.status(400).json({
             message: 'There was a problem creating user'
           });
         }
     } 
     catch (err) {
+      console.log(err)
         return res.status(400).json({
-          message: 'There was a problem creating your account'
+          message: 'There was a problem creating your user account'
         });
     }
 }
 
-userController.userUpdate = async (req, res)=>{
+UserController.userUpdate = async (req, res)=>{
     
     const hashedPassword = await hashPassword(
         req.body.password
     );
+    const { email, firstName, lastName, valid_until, valid } = req.body;
 
-    const user= new User({
-        name: req.body.name,
-        lastname: req.body.lastname,
-        email: req.body.email,
-        password: hashedPassword,
-        valid_until: req.body.valid_until
-    });
+    const user = {
+      email: email.toLowerCase(),
+      firstName,
+      lastName,
+      password: hashedPassword,
+      role: 'admin',
+      valid_until,
+      campus,
+      valid
+    };
     
-    await User.updateOne({_id:req.body.id},user)
+    try{
+      await User.findOneAndUpdate({_id:req.params.id},user).then( () => {
+          res.status(200).json({
+              message: "User was update successfully !!"
+          })
+      })    
+    }
+    catch(err){
+        res.status(400).json({
+            message: "Problem in update the user"
+        })
+    }
 }
 
-userController.userDelete = async (req, res)=>{
-    await User.deleteOne({_id: req.body.id}, function(err){
+UserController.userDelete = async (req, res)=>{
+    await User.deleteOne({_id: req.params.id}, function(err){
         if(err){
             console.log(err);
             res.send(err);
@@ -103,4 +126,4 @@ userController.userDelete = async (req, res)=>{
     
 }
 
-export default userController;
+module.exports= UserController;

@@ -1,8 +1,8 @@
-const { authJwt } = require("../middlewares");
 const controller = require("../controllers/user.controller");
+const express = require('express'); 
+const router = express.Router()
 
-module.exports = function(app) {
-  app.use(function(req, res, next) {
+  router.use(function(req, res, next) {
     res.header(
       "Access-Control-Allow-Headers",
       "x-access-token, Origin, Content-Type, Accept"
@@ -10,9 +10,13 @@ module.exports = function(app) {
     next();
   });
 
-  app.get("/api/users", controller.userList);
+  router.get("/api/users", controller.userRegisters);
+  router.get("/api/:idCampus/users", controller.userList);
+  router.post("/api/:idCampus/users", controller.createUser);
 
-  app.put("/api/users/:id", controller.userUpdate);
+  router.put("/api/:idCampus/user/:id", controller.userUpdate);
 
-  app.delete("/api/users/delete/:id", controller.userDelete);
-};
+  router.delete("/api/:idCampus/user/delete/:id", controller.userDelete);
+
+module.exports = router;
+

@@ -20,8 +20,10 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to jhusseth application." });
 });
 
-app.use(require('./routes/campus.routes'))
 app.use(require('./routes/auth.routes'))
+app.use(require('./routes/campus.routes'))
+app.use(require('./routes/contact.routes'))
+app.use(require('./routes/user.routes'))
 
 
 const attachUser = (req, res, next) => {

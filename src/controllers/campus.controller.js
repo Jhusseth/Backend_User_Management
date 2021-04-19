@@ -10,19 +10,28 @@ CampusController.campusList = async (req, res)=>{
     });
 }
 
+
+CampusController.findById = async (req, res)=>{
+    try{
+        await Campus.findOne({_id:req.params.id}).then( (campus) => {
+            res.status(200).json({
+               campus
+            })
+        })    
+    }
+    catch(err){
+        res.status(400).json({
+            message: "Problem in Query"
+        })
+    }
+}
+
 CampusController.campusCreate = async (req, res)=>{
     const ubication = await new Ubication({
         city: req.body.city,
         address: req.body.address,
         zipcode: req.body.zipcode
     })
-
-    ubication.save(function(err){
-        if (err) {
-            console.log(err);
-            res.send(err);
-        } 
-    });
 
     const campus = await new Campus({
         name: req.body.name,
@@ -54,27 +63,12 @@ CampusController.campusUpdate = async (req, res)=>{
         ubication: ubication
     }
 
-    console.log(campus)
     try{
-        // await Campus.updateOne(({_id:req.params.id},campus),function(err){
-        //     if(err){
-        //         console.log(err);
-        //         res.send(err);
-        //     }
-        //     else{
-        //         res.status(200).json({
-        //             message: "The campus was update"
-        //         })
-        //     }
-        // })
-
         await Campus.findOneAndUpdate({_id:req.params.id},campus).then( () => {
             res.status(200).json({
                 message: " Was update !!"
             })
-        })
-        
-            
+        })    
     }
     catch(err){
         res.status(400).json({
