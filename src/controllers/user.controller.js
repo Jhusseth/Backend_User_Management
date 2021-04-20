@@ -79,20 +79,16 @@ UserController.createUser = async (req, res)=>{
 }
 
 UserController.userUpdate = async (req, res)=>{
-    
-    const hashedPassword = await hashPassword(
-        req.body.password
-    );
-    const { email, firstName, lastName, valid_until, valid } = req.body;
+  
+    const { email, firstName, lastName, valid_until, valid, password} = req.body;
 
     const user = {
       email: email.toLowerCase(),
       firstName,
       lastName,
-      password: hashedPassword,
+      password,
       role: 'admin',
       valid_until,
-      campus,
       valid
     };
     
@@ -124,6 +120,28 @@ UserController.userDelete = async (req, res)=>{
         
     })
     
+}
+
+UserController.userSearch = async (req, res)=>{
+
+  await User.find({firstName:req.params.search}, function(err, users){
+    res.status(200).json({
+        users: users
+    });
+  }); 
+
+}
+
+UserController.userCampusSearch = async (req, res)=>{
+
+  const campuses = await Campus.findOne({name:req.params.search});
+  
+  await User.find({campus:campuses._id}, function(err, users){
+    res.status(200).json({
+      users: users
+    });
+  });  
+
 }
 
 module.exports= UserController;

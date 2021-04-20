@@ -13,6 +13,8 @@ const router = express.Router()
 
   router.get("/api/campus", controller.campusList);
 
+  router.get("/api/campus/:id", controller.findById);
+
   router.post("/api/campus", controller.campusCreate);
 
   router.put("/api/campus/:id", controller.campusUpdate);

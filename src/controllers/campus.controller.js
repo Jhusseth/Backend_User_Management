@@ -1,5 +1,6 @@
 const CampusController = {};
 const Campus = require('../models/campus.model')
+const User = require('../models/user.model')
 const {Ubication} = require('../models/ubication.model')
 
 CampusController.campusList = async (req, res)=>{
@@ -13,11 +14,11 @@ CampusController.campusList = async (req, res)=>{
 
 CampusController.findById = async (req, res)=>{
     try{
-        await Campus.findOne({_id:req.params.id}).then( (campus) => {
+        Campus.findOne({_id:req.params.id}, function(err, campus){
             res.status(200).json({
-               campus
-            })
-        })    
+                campus: campus,
+            });
+        });    
     }
     catch(err){
         res.status(400).json({
@@ -78,18 +79,26 @@ CampusController.campusUpdate = async (req, res)=>{
 }
 
 CampusController.campusDelete = async (req, res)=>{
-    await Campus.deleteOne({_id: req.params.id}, function(err){
-        if(err){
-            console.log(err);
-            res.send(err);
-        }
-        else{
-            res.status(200).json({
-                message: "The campus was deleted"
-            })
-        }
-        
-    })
+    const users = await User.find({campus:req.params.id});
+    if(users.length>0){
+        res.status(400).json({
+            message: "Cannot be deleted, contains users"
+        })
+    }
+    else{
+        await Campus.deleteOne({_id: req.params.id}, function(err){
+            if(err){
+                console.log(err);
+                res.send(err);
+            }
+            else{
+                res.status(200).json({
+                    message: "The campus was deleted"
+                })
+            }
+            
+        })
+    }
 }
 
 module.exports= CampusController;
